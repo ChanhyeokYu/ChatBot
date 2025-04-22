@@ -25,7 +25,7 @@ public:
 	float cross_entropy_loss(const ::vector<float>& y_hat, const ::vector<float>& y);
 
 private:
-	MachineMath();
+	MachineMath() = default;
 	MachineMath(const MachineMath&&) = delete;	
 	MachineMath(const MachineMath&) = delete;
 	MachineMath& operator=(MachineMath&) = delete;
