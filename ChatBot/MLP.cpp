@@ -2,7 +2,7 @@
 
 MLP::MLP(int input_size, int hidden_size, int output_size)
 {
-    W1.resize(hidden_size, vector<float>(input_size);
+    W1.resize(hidden_size, vector<float>(input_size));
     b1.resize(hidden_size, 0.0f);
     z1.resize(hidden_size);
     a1.resize(hidden_size);
@@ -82,6 +82,44 @@ std::vector<float> MLP::forward(const std::vector<float>& input)
 
 void MLP::backward(const std::vector<float>& input, const std::vector<float>& target, float learning_rate)
 {
+    // 출력층 오차(softmax + CrossEntropy 미분)
+    std::vector<float> delta2(output.size());
+    for (size_t i = 0; i < output.size(); ++i)
+    {
+        delta2[i] = output[i] - target[i];
+    }
+
+    // 은닉층 오차
+    std::vector<float> delta1(a1.size(), 0.0f);
+    for (size_t i = 0; i < a1.size(); ++i)
+    {
+        float grad = 0.0f;
+        for (size_t j = 0; j < output.size(); ++i)
+        {
+            grad += delta2[j] * W2[j][i]; // 역전파
+        }
+        delta1[i] = grad * MachineMath::GetInstance().relu_derivative(z1[i]);
+    }
+
+    // W2, b2 업데이트
+    for (size_t i = 0; i < W2.size(); ++i)
+    {
+        for (size_t j = 0; j < a1.size(); ++j)
+        {
+            W2[i][j] -= learning_rate * delta2[i] * a1[j];
+        }
+        b2[i] -= learning_rate * delta2[i];
+    }
+
+    // W1, b1 업데이트
+    for (size_t i = 0; i < W1.size(); ++i)
+    {
+        for (size_t j = 0; j < input.size(); ++j)
+        {
+            W1[i][j] -= learning_rate * delta1[i] * input[j];
+        }
+        b1[i] -= learning_rate * delta2[i];
+    }
 }
 
 float MLP::randWeigth()
